@@ -7,10 +7,9 @@
 Adafruit_MLX90614 mlx = Adafruit_MLX90614();
 
 RTC_DS1307 rtc;
-DateTime tiempo;
 DateTime lastValidDate;
 unsigned long timer = millis();
-bool reg = false;
+bool reg = false, led = true, madera;
 
 SoftwareSerial mySerial(16, 17);  //Define software serial, 3 is TX, 2 is RX
 char buff[4] = { 0x80, 0x06, 0x03, 0x77 };
@@ -35,24 +34,26 @@ void WriteFile(const char* path, const char* message) {
 void appendFile(const char* path, String message) {
   File file = SD.open(path, FILE_APPEND);
   if (!file) {
-    Serial.println("Failed to open file for appending");
+    //Serial.println("Failed to open file for appending");
     return;
   }
   if (!file.print(message)) {
-    Serial.println("Append failed");
+    //Serial.println("Append failed");
   }
   file.close();
 }
 
 void regMem() {
-  String fyh = String(tiempo.timestamp(DateTime::TIMESTAMP_FULL));
-  appendFile("/registro_laser.txt", fyh + " " + String(dis) + " " + String(temp) + "\n");
+  String fyh = String(rtc.now().timestamp(DateTime::TIMESTAMP_FULL));
+  fyh.replace('T', ' ');
+  Serial.print(fyh + " ");
+  appendFile("/registro_laser.txt", fyh + " " + String(temp) + " " + String(dis) + " " + String(madera) + "\n");
 }
 
 void distancia(void* pv) {
   while (1) {
     reg = false;
-    Serial.println("esperando datos");
+    //Serial.println("esperando datos");
     while (!mySerial.available()) {
     }  //Determine whether there is data to read on the serial
     delay(50);
@@ -71,7 +72,7 @@ void distancia(void* pv) {
       } else {
         float distance = (data[3] - 0x30) * 100 + (data[4] - 0x30) * 10 + (data[5] - 0x30) * 1 + (data[7] - 0x30) * 0.1 + (data[8] - 0x30) * 0.01 + (data[9] - 0x30) * 0.001;
         dis = distance * 1000;
-        Serial.println("hola");
+        //Serial.println("hola");
         reg = true;
       }
     } else {
@@ -104,8 +105,10 @@ void setup() {
   }
   if (!SD.exists("/registro_laser.txt")) {
     Serial.println("creando registro");
-    WriteFile("/registro_laser.txt", "Fecha_y_Hora Distancia(mm) Temperatura(ºC)");
+    WriteFile("/registro_laser.txt", "Fecha Hora Temperatura(ºC) Distancia(mm) Madera\n");
   }
+  pinMode(14, OUTPUT);
+  pinMode(25, INPUT);
   mySerial.print(buff);
   xTaskCreatePinnedToCore(
     distancia, /* Function to implement the task */
@@ -118,18 +121,25 @@ void setup() {
 }
 
 void loop() {
-  if ( millis() - timer > 240) {
-    timer=millis();
-    tiempo = rtc.now();
-    temp = mlx.readObjectTempC();
+
+  if (millis() - timer > 1000) {
+    if (led == true) {
+      digitalWrite(14, HIGH);
+    } else {
+      digitalWrite(14, LOW);
+    }
+    led = !led;
+    timer = millis();
+  }
+  madera = !digitalRead(25);
+  temp = mlx.readObjectTempC();
+  if (reg) {
     regMem();
-    ldis = dis;
-    Serial.print(String(tiempo.timestamp(DateTime::TIMESTAMP_TIME)) + " ");
     Serial.print(dis);
-    Serial.print(" Ambiente = ");
-    Serial.print(mlx.readAmbientTempC());
-    Serial.print(" ºC\tObjeto = ");
+    Serial.print("mm\tObjeto =");
     Serial.print(temp);
-    Serial.println("ºC");
+    Serial.print("ºC ");
+    Serial.print("Madera: ");
+    Serial.println(madera);
   }
 }
