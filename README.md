@@ -1,0 +1,5 @@
+[Sensor de proximidad fotoeléctrico E3F-R2N12](https://naylampmechatronics.com/sensores-proximidad/294-sensor-de-proximidad-fotoelectrico-reflex-e3f-r2n12.html)
+![alt text](http://url/to/img.png)
+[Laser Tw10s-uart Alibaba](https://www.alibaba.com/product-detail/Original-TW10S-UART-Laser-Measure-Sensor_1600941266053.html)
+[Datasheet](https://github.com/sainquake/tw10s/blob/master/datasheet.pdf)
+![alt text]([http://url/to/img.png](https://s.alicdn.com/@sc04/kf/H193bac415d5f4ccd924d03f881147bf2F.jpg_720x720q50.jpg))
