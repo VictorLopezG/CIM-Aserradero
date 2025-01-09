@@ -1,7 +1,7 @@
 ## Sensor de proximidad fotoeléctrico E3F-R2N12 
 [Tienda](https://naylampmechatronics.com/sensores-proximidad/294-sensor-de-proximidad-fotoelectrico-reflex-e3f-r2n12.html)
 <br>
-<img src="https://naylampmechatronics.com/1214-superlarge_default/sensor-de-proximidad-fotoelectrico-reflex-e3f-r2n12.jpg" width=20% height=20%>
+<img src="https://m.media-amazon.com/images/I/51o9LTAJ4jL._SY445_SX342_QL70_ML2_.jpg" width=20% height=20%>
 
 ## Laser Tw10s-uart
 [Tienda](https://www.alibaba.com/product-detail/Original-TW10S-UART-Laser-Measure-Sensor_1600941266053.html)
