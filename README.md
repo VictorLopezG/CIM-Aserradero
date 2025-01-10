@@ -8,6 +8,11 @@
 [Datasheet](https://github.com/sainquake/tw10s/blob/master/datasheet.pdf)<br>
 <img src="https://s.alicdn.com/@sc04/kf/H193bac415d5f4ccd924d03f881147bf2F.jpg_720x720q50.jpg" width=20% height=20%>
 
+## Sensor VL53L0X (ToF)
+[Sitio](https://electrocredible.com/vl53l0x-arduino-measure-distance-time-of-flight-sensor/)<br>
+<img src="https://q7m2w7c5.delivery.rocketcdn.me/wp-content/uploads/2019/05/01-4.jpg" width=20% height=20%>
+
+
 # Formato datos
 ## Temperatura y Lasers
 Fecha Hora Temperatura Distancia Laser_pequeño Paso_Madera<br>
