@@ -1,3 +1,4 @@
+// Modulo Laser reparado
 #include <SoftwareSerial.h>
 #include <SD.h>
 #include <RTClib.h>
