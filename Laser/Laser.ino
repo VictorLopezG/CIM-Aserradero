@@ -92,8 +92,8 @@ void SD_init() {
 }
 
 String getDate() {
-  DateTime currentDateTime = DS1307_RTC.now();
-  String dateTime = String(currentDateTime.timestamp(DateTime::TIMESTAMP_DATE)) + " " + String(currentDateTime.timestamp(DateTime::TIMESTAMP_TIME));
+  DateTime now = DS1307_RTC.now();
+  String dateTime = String(now.year()) + "/" + String(now.month()) + "/" + String(now.day()) + " " + String(now.hour()) + ":" + String(now.minute()) + ":" + String(now.second());
   // Serial.println(dateTime);
   return dateTime;
 }
@@ -191,7 +191,6 @@ void loop() {
       Serial.print("Pasando Madera: ");
       Serial.println(ValidadorMadera);
       String temperatura = String(Temp);
-      temperatura.replace('.', ',');
       String datosSD = fecha + " " + String(temperatura) + " " + String(distance) + " " + String(measure1.RangeMilliMeter) + " " + String(ValidadorMadera) + "\n";
       appendFile(SD, "/Datos.txt", datosSD.c_str());
     } else {
