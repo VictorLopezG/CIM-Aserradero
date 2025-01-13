@@ -19,6 +19,7 @@ bool corte=false;
 unsigned long timer = 0;
 bool led = true;
 unsigned long inicio,fin;
+
 void writeFile(fs::FS &fs, const char *path, const char *message) {
   //Serial.printf("Writing file: %s\n", path);
 
@@ -66,8 +67,6 @@ void RTC_init() {
 
 void setup() {
   Serial.begin(115200);
-  //mlx.begin();
-
   pinMode(14, OUTPUT);
 
   if (!SD.begin(CS)) {
@@ -82,8 +81,6 @@ void setup() {
     writeFile(SD, "/corr.txt", "Fecha Corriente(A) Rapidez(M/Min)");
   }
   energyMonitor.current(2, 11.11);
-  //energyMonitor3.current(1, 111.1);
-  //energyMonitor1.current(1, 3.03);
 }
 
 void loop() {
@@ -99,12 +96,12 @@ void loop() {
     timer = millis();
   }
 
-  String fecha = String(rtc.now().timestamp(DateTime::TIMESTAMP_DATE)+" "+rtc.now().timestamp(DateTime::TIMESTAMP_TIME));
+  DateTime now = rtc.now();
+  String fecha = String(now.year()) + "/" + String(now.month()) + "/" + String(now.day()) + " " + String(now.hour()) + ":" + String(now.minute()) + ":" + String(now.second());
 
   double corriente1 = Irms*1.7;
-  if(corriente1>0.2)corriente1-=0.2;
+  if(corriente1>0.2)corriente1 -=0.2;
   String corr = String(corriente1);
-  corr.replace('.', ',');
   String Datos = fecha + " " + corr;  // + " " + String(corriente2) + " " + String(corriente3);
   
   if(corriente1>=19.7 && !corte){
@@ -116,7 +113,6 @@ void loop() {
     corte=false;
     float rapid=(3.3*60000)/(fin-inicio);
     String rapidez=String(rapid);
-    rapidez.replace('.',',');
     Datos+=" "+rapidez;
   }
   Datos+='\n';
