@@ -16,7 +16,7 @@ RTC_DS1307 rtc;
 VL53L0X_RangingMeasurementData_t measure;
 
 int distanceThreshold = 200;         // Umbral en mm para detectar un orificio (mm)
-unsigned long timeThreshold = 1800;  // Tiempo antes del timeout (ms)
+unsigned long timeThreshold = 2000;  // Tiempo antes del timeout (ms)
 volatile int pulseCount = 0;         // Contador de orificios detectados
 unsigned long lastEventTime = 0;     // Tiempo del último evento (time)
 unsigned long currentTime = 0;       // Tiempo actual
