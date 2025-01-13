@@ -45,9 +45,9 @@ void appendFile(const char* path, String message) {
 }
 
 void regMem() {
-  String fyh = String(rtc.now().timestamp(DateTime::TIMESTAMP_FULL));
-  fyh.replace('T', ' ');
-  Serial.print(fyh + " ");
+  DateTime now = rtc.now();
+  String time = String(now.year()) + "/" + String(now.month()) + "/" + String(now.day()) + " " + String(now.hour()) + ":" + String(now.minute()) + ":" + String(now.second());
+  Serial.print(time + " ");
   appendFile("/registro_laser.txt", fyh + " " + String(temp) + " " + String(dis) + " " + String(madera) + "\n");
 }
 
