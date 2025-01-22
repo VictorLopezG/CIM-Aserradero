@@ -54,8 +54,8 @@ void appendFile(fs::FS &fs, const char *path, const char *message) {
 
 void RTC_init() {
   rtc.begin();
-  Serial.println(!rtc.isrunning() ? "RTC no funciona" : "RTC funcionando");
-  if (!rtc.isrunning()) {
+  Serial.println(rtc.isrunning() ? "RTC no funciona" : "RTC funcionando");
+  if (rtc.!isrunning()) {
     Serial.println("Ajustando el reloj interno...");
     rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
     a = 1;
@@ -78,7 +78,7 @@ void setup() {
   RTC_init();
 
   if (!SD.exists("/corr.txt")) {
-    writeFile(SD, "/corr.txt", "Fecha Corriente(A) Rapidez(M/Min)");
+    writeFile(SD, "/corr.txt", "Fecha Hora Corriente(A)");
   }
   energyMonitor.current(2, 11.11);
 }
@@ -102,21 +102,10 @@ void loop() {
   double corriente1 = Irms*1.7;
   if(corriente1>0.2)corriente1 -=0.2;
   String corr = String(corriente1);
-  String Datos = fecha + " " + corr;  // + " " + String(corriente2) + " " + String(corriente3);
-  
-  if(corriente1>=19.7 && !corte){
-    inicio=millis();
-    corte=true;
-  }
-  if(corriente1<=18 && corte){
-    fin=millis();
-    corte=false;
-    float rapid=(3.3*60000)/(fin-inicio);
-    String rapidez=String(rapid);
-    Datos+=" "+rapidez;
-  }
+  String Datos = fecha + " " + corr;
   Datos+='\n';
   Serial.print(Datos);
+  
   //guardar datos
   appendFile(SD, "/corr.txt", Datos.c_str());
 }
