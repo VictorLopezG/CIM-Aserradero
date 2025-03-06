@@ -91,7 +91,7 @@ void setup() {
     Serial.println("Couldn't find RTC");
     Serial.flush();
   }
-  if (rtc.isrunning()) {
+  if (!rtc.isrunning()) {
     rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));  //-------------- TODO:
   } else {
     lastValidDate = rtc.now();
@@ -137,7 +137,7 @@ void loop() {
   if (reg) {
     regMem();
     Serial.print(dis);
-    Serial.print("mm\tObjeto =");
+    Serial.print("mm\tObjeto = ");
     Serial.print(temp);
     Serial.print("ºC ");
     Serial.print("Madera: ");

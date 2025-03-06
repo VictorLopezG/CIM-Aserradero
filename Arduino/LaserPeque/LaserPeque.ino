@@ -127,6 +127,8 @@ void setup() {
     Serial.println("Initialization SD failed!");
     sd_check = false;
     return;
+  } else {
+    sd_check = true;
   }
   if (!SD.exists("/Datos.txt")) {
     File myFile = SD.open("/Datos.txt", FILE_WRITE);
