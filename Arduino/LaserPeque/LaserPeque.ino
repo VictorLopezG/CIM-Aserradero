@@ -20,7 +20,7 @@
 //modulo ads
 #define ADS1_ADDRESS 0x48
 //reloj
-RTC_DS1307 DS1307_RTC;
+RTC_DS1307 rtc;
 SoftwareSerial mySerial(TX_laser, RX_laser);
 //comprobacion de datos
 CRC16 crc(CRC16_MODBUS_POLYNOME,
@@ -29,11 +29,11 @@ CRC16 crc(CRC16_MODBUS_POLYNOME,
           CRC16_MODBUS_REV_IN,
           CRC16_MODBUS_REV_OUT);
 
-float Temp;
+double Temp;
 VL53L0X_RangingMeasurementData_t measure1;
 int a = 0;
 int b = 0;
-bool led = true;
+bool led = true, sd_check = false;
 
 Adafruit_VL53L0X lox1 = Adafruit_VL53L0X();
 //inicialización de la biblioteca modulo ads y sensor temp
@@ -54,11 +54,11 @@ uint32_t calcul_distance(uint8_t a, uint8_t b, uint8_t c, uint8_t d) {
 }
 //iniciar reloj
 void RTC_init() {
-  DS1307_RTC.begin();
-  Serial.println(!DS1307_RTC.isrunning() ? "RTC no funciona" : "RTC funcionando");
-  if (!DS1307_RTC.isrunning()) {
+  rtc.begin();
+  Serial.println(!rtc.isrunning() ? "RTC no funciona" : "RTC funcionando");
+  if (!rtc.isrunning()) {
     Serial.println("Ajustando el reloj interno...");
-    DS1307_RTC.adjust(DateTime(F(__DATE__), F(__TIME__)));
+    rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
     a = 1;
   } else {
     b = 1;
@@ -68,7 +68,13 @@ void RTC_init() {
 
 void writeFile(fs::FS &fs, const char *path, const char *message) {
   File file = fs.open(path, FILE_WRITE);
-  Serial.println(!file ? "Archivo no se pudo abrir" : "Archivo abierto");
+  if(file){
+    Serial.println("Archivo no se pudo abrir");
+    sd_check = false;
+  } else {
+    Serial.println("Archivo abierto");
+    sd_check = true;
+  }
   Serial.println(file.print(message) ? "Archivo escrito" : "No se ha podido escribir");
   file.close();
 }
@@ -80,19 +86,25 @@ void appendFile(fs::FS &fs, const char *path, const char *message) {
 }
 //iniciar SD
 void SD_init() {
-  Serial.println(!SD.begin() ? "No se puede encontrar la SD" : "Se encontro la SD");
+  if(!SD.begin()){
+    Serial.println("No se puede encontrar la SD");
+    sd_check = false;
+  } else {
+    Serial.println("Se encontro la SD");
+    sd_check = true;
+  }
   File file = SD.open("/Datos.txt");
   Serial.println(!file ? "El archivo no existe, se creara uno" : "El archivo ya existe");
   if (!file) {
     writeFile(SD, "/Datos.txt", "-WPMS5003\r\n");
-  } else if (file) {
+  } else {
     appendFile(SD, "/Datos.txt", "-APMS5003\r\n");
   }
   file.close();
 }
 
 String getDate() {
-  DateTime now = DS1307_RTC.now();
+  DateTime now = rtc.now();
   String dateTime = String(now.year()) + "/" + String(now.month()) + "/" + String(now.day()) + " " + String(now.hour()) + ":" + String(now.minute()) + ":" + String(now.second());
   // Serial.println(dateTime);
   return dateTime;
@@ -113,13 +125,12 @@ void setup() {
 
   if (!SD.begin(5)) {
     Serial.println("Initialization SD failed!");
+    sd_check = false;
     return;
-  } else {
-    Serial.println("Initialization SD done.");
   }
   if (!SD.exists("/Datos.txt")) {
     File myFile = SD.open("/Datos.txt", FILE_WRITE);
-    myFile.println("Fecha Hora Temperatura Distancia Laser_pequeño Paso_Madera");
+    myFile.println("Fecha Hora Temperatura Distancia Laser_pequeño");
     myFile.close();
   }
 }
@@ -136,9 +147,9 @@ void loop() {
       mySerial.overflow();
     }
     Temp = mlx.readObjectTempC();  //Temperatura obtenida del sensor de temperatura
-    Serial.print("Temperatura Objeto: ");
+    //Serial.print("Temperatura Objeto: ");
     // Serial.println(Temp);
-    lox1.rangingTest(&measure1, true);
+    lox1.rangingTest(&measure1);
 
     for (int i = 0; i < sizeof(data); i++) {
       crc.add(data[i]);
@@ -156,26 +167,10 @@ void loop() {
     crc.restart();
     timer = millis();
     String fecha = getDate();
-
-    int ValidadorMadera;
-    //verificar paso de la madera
-    if (measure1.RangeMilliMeter > 198) {
-      ValidadorMadera = 0;
-    } else {
-      ValidadorMadera = 1;
-    }
-    //parpadeo del led
-    if (led == true) {
-      digitalWrite(14, HIGH);
-    } else {
-      digitalWrite(14, LOW);
-    }
-    led = !led;
-
+    
     int contador;
     //visualizar y guardar los datos
     if (distance != 0 && !isnan(Temp) && distance < 20000 && CRC == 0) {
-
       Serial.println("------- Datos del Sensor -------");
       Serial.print("Fecha: ");
       Serial.println(fecha);  // Asegúrate de que 'fecha' esté definida y tenga un formato válido
@@ -188,11 +183,18 @@ void loop() {
       Serial.print("Medidas Laser Pequeño: ");
       Serial.print(measure1.RangeMilliMeter);
       Serial.println(" mm");
-      Serial.print("Pasando Madera: ");
-      Serial.println(ValidadorMadera);
-      String temperatura = String(Temp);
-      String datosSD = fecha + " " + String(temperatura) + " " + String(distance) + " " + String(measure1.RangeMilliMeter) + " " + String(ValidadorMadera) + "\n";
+      
+      String datosSD = fecha + " " + String(Temp) + " " + String(distance) + " " + String(measure1.RangeMilliMeter) + "\n";
       appendFile(SD, "/Datos.txt", datosSD.c_str());
+
+      // Parpadeo del led
+      if (led == true) {
+        digitalWrite(14, HIGH);
+      } else {
+        if(sd_check){ digitalWrite(14, LOW);}
+      }
+      led = !led;
+
     } else {
       Serial.println("Datos se estan recibiendo mal");
       Serial.println("Distancia= " + String(distance) + " Temperatura = " + String(Temp) + " CRC =" + String(CRC));
@@ -200,6 +202,8 @@ void loop() {
       if (contador >= 35) {
         ESP.restart();
       }
+      // Apagar led
+      digitalWrite(14, LOW);
     }
   }
 }

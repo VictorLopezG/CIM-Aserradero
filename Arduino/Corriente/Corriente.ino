@@ -54,8 +54,8 @@ void appendFile(fs::FS &fs, const char *path, const char *message) {
 
 void RTC_init() {
   rtc.begin();
-  Serial.println(rtc.isrunning() ? "RTC no funciona" : "RTC funcionando");
-  if (rtc.!isrunning()) {
+  Serial.println(!rtc.isrunning() ? "RTC no funciona" : "RTC funcionando");
+  if (!rtc.isrunning()) {
     Serial.println("Ajustando el reloj interno...");
     rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
     a = 1;
