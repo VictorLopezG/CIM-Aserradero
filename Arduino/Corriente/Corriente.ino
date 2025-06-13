@@ -7,46 +7,31 @@
 // Crear una instancia EnergyMonitor
 EnergyMonitor energyMonitor;
 RTC_DS1307 rtc;
-//EnergyMonitor energyMonitor1;
 // Voltaje de nuestra red eléctrica
-float voltajeRed = 116.0;
 const int CS = 5;          // Chip Select de la SD
-int errorCount = 0;        // Contador de errores
-const int maxErrors = 20;  // Número máximo de errores permitidos antes de reiniciar
-double maximo = 0.0;
 int a, b;
-bool corte=false;
 unsigned long timer = 0;
 bool led = true;
-unsigned long inicio,fin;
 
 void writeFile(fs::FS &fs, const char *path, const char *message) {
-  //Serial.printf("Writing file: %s\n", path);
-
   File file = fs.open(path, FILE_WRITE);
   if (!file) {
     Serial.println("Failed to open file for writing");
     return;
   }
-  if (file.print(message)) {
-    //Serial.println("File written");
-  } else {
+  if (!file.print(message)) {
     Serial.println("Write failed");
   }
   file.close();
 }
 
 void appendFile(fs::FS &fs, const char *path, const char *message) {
-  //Serial.printf("Appending to file: %s\n", path);
-
   File file = fs.open(path, FILE_APPEND);
   if (!file) {
     Serial.println("Failed to open file for appending");
     return;
   }
-  if (file.print(message)) {
-    //Serial.println("Message appended");
-  } else {
+  if (!file.print(message)) {
     Serial.println("Append failed");
   }
   file.close();
@@ -100,7 +85,7 @@ void loop() {
   String fecha = String(now.year()) + "/" + String(now.month()) + "/" + String(now.day()) + " " + String(now.hour()) + ":" + String(now.minute()) + ":" + String(now.second());
 
   double corriente1 = Irms*1.7;
-  if(corriente1>0.2)corriente1 -=0.2;
+  if(corriente1>0.2)corriente1 -= 0.2;
   String corr = String(corriente1);
   String Datos = fecha + " " + corr;
   Datos+='\n';

@@ -1,4 +1,5 @@
 #include "Adafruit_VL53L0X.h"
+#include <SoftwareSerial.h>
 #include <Wire.h>
 #include <SD.h>
 #include "RTClib.h"
@@ -6,6 +7,7 @@
 int mill;
 unsigned long t_offset = 0;
 unsigned long time_out = 0;
+
 // Configuración del sensor y SD
 #define VL53_ADDRESS 0x29
 #define SD_CS_PIN 5  // Pin Chip Select para la SD

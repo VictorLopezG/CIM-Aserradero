@@ -8,7 +8,6 @@
 #include <Adafruit_ADS1X15.h>
 #include <SoftwareSerial.h>
 #include <CRC16.h>
-#include <SoftwareSerial.h>
 #include <SD.h>
 //puertos para el laser grande
 #define TX_laser 17

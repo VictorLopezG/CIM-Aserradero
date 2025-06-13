@@ -1,0 +1,1 @@
+Fecha Hora Temperatura Distancia Laser_pequeño Paso_Madera
